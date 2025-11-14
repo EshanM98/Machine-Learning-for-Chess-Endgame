@@ -7,6 +7,8 @@ from tensorflow.keras import layers
 import autograd.numpy as np
 from autograd import grad
 
+import matplot.pyplot as plt
+
 #defining model and cost functions
 
 def model(x,w):
@@ -66,7 +68,7 @@ def miscount(w,x,y):
     return counts
 
 
-def compare(Xtrain, Ytrain, Xtest, Ytest, Y_nothot, w, alpha, alpha2, max_its, show = False, comparison):
+def compare(Xtrain, Ytrain, Xtest,Y_nothot, alpha, alpha2, max_its, comparison, show = False ):
     #Initialize functions
     g_linear = lambda w:linear(w)
     g_perceptron = lambda w:perceptron(w)
@@ -158,4 +160,34 @@ def learning_model(Xtrain, Ytrain, Xtest, Ytest, batch_size, epochs, activation)
                         shuffle = True)
     return history
 
+#function to train model with different activation functions and plot comparisons
+def activation_comparison(Xtrain,Ytrain,Xtest,Ytest,batch_size,epochs,act_func, show = False):    #act_func is a list of all activation functions to compare
+    
+    histories = {}
 
+    for act in act_func:
+        hist = f'hist_{act}'
+        hist_func = learning_model(Xtrain,Ytrain,Xtest,Ytest,batch_size,epochs,act)
+        
+        histories[hist] = hist_func
+    if show == True:
+        
+        fig, ax = plt.subplots(figsize = (10,10))
+        ax.set_title('Accuracy of Models')
+        ax.set_xlabel('Epochs')
+        ax.set_ylabel('Accuracy')
+        for key in histories:
+            ax.plot(histories[key].history['val_accuracy'],label = str(key))
+        plt.legend()
+        plt.show()
+        
+        
+        fig, ax = plt.subplots(figsize = (10,10))
+        ax.set_title('Loss of Models')
+        ax.set_xlabel('Epochs')
+        ax.set_ylabel('Loss')
+        for key in histories:
+            ax.plot(histories[key].history['val_loss'],label = str(key))
+        plt.legend()
+        plt.show()
+        
